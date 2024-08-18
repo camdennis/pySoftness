@@ -92,3 +92,42 @@ void getGR(double* gr, double* rLists, double* positions, int* rListLengths, dou
     GRPP(gr, rij, rLists, rListLengths, rho, delta, NA, NB);
 }
 
+void getISFOverlap(double* ISFOverlap, double* positions1, double* positions2, double L, double gamma, double rmax, double cutoff, int N) {
+    double* dirVec = new double[26 * 3];
+    double dx, dy, dz, cy, theta, phi, qdot, dist;
+    int kk;
+    double pi4 = 0.78539816339744830962;
+    kk = -1;
+    ISFOverlap[0] = 0.0;
+    ISFOverlap[1] = 0.0;
+    for (int i = 0; i < 8; i++) {
+        theta = i * pi4;
+        for (int j = 0; j < 3; j++) {
+            phi = pi4 * (j + 1);
+            kk++;
+            dirVec[kk * 3 + 0] = cos(theta) * sin(phi);
+            dirVec[kk * 3 + 1] = sin(theta) * sin(phi);
+            dirVec[kk * 3 + 2] = cos(phi);
+        }
+    }
+    dirVec[24 * 3 + 2] = 1;
+    dirVec[25 * 3 + 2] = -1;
+    for (int i = 0; i < N; i++) {
+        dx = positions2[i * 3 + 0] - positions1[i * 3 + 0];
+        dy = positions2[i * 3 + 1] - positions1[i * 3 + 1];
+        dz = positions2[i * 3 + 2] - positions1[i * 3 + 2];
+        cy = round(dy / L) * L;
+        dx = dx - cy * gamma;
+        dz = dz - round(dz / L) * L;
+        dy = dy - cy;
+        if (sqrt(dx * dx + dy * dy + dz * dz) < cutoff) {
+            ISFOverlap[1] += 1;
+        }
+        for (int j = 0; j < 26; j++) {
+            ISFOverlap[0] += cos(dirVec[3 * j + 0] * pi4 * 4 / rmax * dx + dirVec[3 * j + 1] * pi4 * 4 / rmax * dy + dirVec[3 * j + 2] * pi4 * 4 / rmax * dz);
+        }
+
+    }
+    ISFOverlap[0] /= 26;
+    ISFOverlap[1] /= N;
+}

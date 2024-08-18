@@ -22,5 +22,15 @@ PYBIND11_MODULE(libstructureFactor, m) {
         int* rListLengths_ptr = static_cast<int*>(rListLengths_buf.ptr);
         double* positions_ptr = static_cast<double*>(positions_buf.ptr);
         getGR(gr_ptr, rLists_ptr, positions_ptr, rListLengths_ptr, L, gamma, rho, delta, NA, NB);
+    }),
+    m.def("getISFOverlap", [](py::array_t<double> ISFOverlap, py::array_t<double> positions1, py::array_t<double> positions2, double L, double gamma, double rmax, double cutoff, int N) {
+        py::buffer_info positions1_buf = positions1.request();
+        py::buffer_info positions2_buf = positions2.request();
+        py::buffer_info ISFOverlap_buf = ISFOverlap.request();
+
+        double* positions1_ptr = static_cast<double*>(positions1_buf.ptr);
+        double* positions2_ptr = static_cast<double*>(positions2_buf.ptr);
+        double* ISFOverlap_ptr = static_cast<double*>(ISFOverlap_buf.ptr);
+        getISFOverlap(ISFOverlap_ptr, positions1_ptr, positions1_ptr, L, gamma, rmax, cutoff, N);
     });
 }
