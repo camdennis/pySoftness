@@ -37,6 +37,6 @@ PYBIND11_MODULE(libstructureFactor, m) {
         double* positions1_ptr = static_cast<double*>(positions1_buf.ptr);
         double* positions2_ptr = static_cast<double*>(positions2_buf.ptr);
         double* ISFOverlap_ptr = static_cast<double*>(ISFOverlap_buf.ptr);
-        getISFOverlap(ISFOverlap_ptr, positions1_ptr, positions1_ptr, L, gamma, rmax, cutoff, N);
+        getISFOverlap(ISFOverlap_ptr, positions1_ptr, positions2_ptr, L, gamma, rmax, cutoff, N);
     });
 }

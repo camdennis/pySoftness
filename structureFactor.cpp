@@ -102,9 +102,9 @@ void GRPP(double* gr, double* rij, double* rList, int numR, double rho, double d
     int c2 = c1 + NA * numR;
     int c3 = c2 + NB * numR;
     int c4 = c3 + NB * numR;
-    int i, rIndex;
     #pragma omp parallel for
     for (int idx = 0; idx < c4; idx++) {
+        int i, rIndex;
         int cMin = c3;
         int Nmin = NA;
         int Nmax = NA + NB;
@@ -132,7 +132,7 @@ void GRPP(double* gr, double* rij, double* rList, int numR, double rho, double d
         i = (idx - cMin) / numR + iMin;
         r = rList[rIndex];
         gr[idx] = 0.0;
-        #pragma omp parallel for
+//        double grLocal = 0.0; // Local accumulation
         for (int j = Nmin; j < Nmax; j++) {
             if (i < j) {
                 rp = rij[((N * (N - 1)) / 2) - ((N - i) * ((N - i) - 1)) / 2 + j - i - 1];
@@ -145,7 +145,10 @@ void GRPP(double* gr, double* rij, double* rList, int numR, double rho, double d
 //            }
             factor = exp(-(r - rp) * (r - rp) / (2 * delta * delta)) * prefactor / (r * r);
             gr[idx] += factor;
+//            grLocal += factor;
         }
+//        #pragma omp atomic
+//        gr[idx] += grLocal;
     }
 }
 
@@ -198,6 +201,7 @@ void getGR(double* gr, double* rList, double* positions, int numR, double L, dou
     double* rij = new double[numElements];
     getRij(rij, positions, L, gamma, NA + NB);
     GRPP(gr, rij, rList, numR, rho, delta, NA, NB);
+    delete rij;
 }
 
 void getISFOverlap(double* ISFOverlap, double* positions1, double* positions2, double L, double gamma, double rmax, double cutoff, int N) {
@@ -228,7 +232,9 @@ void getISFOverlap(double* ISFOverlap, double* positions1, double* positions2, d
         dx = dx - cy * gamma;
         dz = dz - round(dz / L) * L;
         dy = dy - cy;
-        if (sqrt(dx * dx + dy * dy + dz * dz) < cutoff) {
+        double dr = sqrt(dx * dx + dy * dy + dz * dz);
+//        std::cout << dr << std::endl;
+        if (dr < cutoff) {
             ISFOverlap[1] += 1;
         }
         for (int j = 0; j < 26; j++) {
@@ -236,6 +242,7 @@ void getISFOverlap(double* ISFOverlap, double* positions1, double* positions2, d
         }
 
     }
-    ISFOverlap[0] /= 26;
+    ISFOverlap[0] /= (26 * N);
     ISFOverlap[1] /= N;
+    delete dirVec;
 }
