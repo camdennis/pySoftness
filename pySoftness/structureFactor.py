@@ -45,7 +45,7 @@ def getISFOverlap(positions1, positions2, L, gamma, rmax, cutoff, N):
     return ISFOverlap[0], ISFOverlap[1]
 
 def LJPot(dr, sigma, epsilon):
-    maxFactor = 0.4
+    maxFactor = 0.4 / sigma
     epsFactor = 0.016316891136
     idr = (sigma / dr)
     idr[idr <= maxFactor] = 0.0
@@ -56,7 +56,7 @@ def LJPot(dr, sigma, epsilon):
 #    return 4 * epsilon * (idr**12 - idr**6)
 
 def WCAPot(dr, sigma, epsilon):
-    maxFactor = 0.890898718140339304740226205590512523
+    maxFactor = 0.890898718140339304740226205590512523 /sigma
     idr = (sigma / dr)
 #    idr = idr[idr > maxFactor]
     idr[idr <= maxFactor] = 0.0
