@@ -48,7 +48,7 @@ def LJPot(dr, sigma, epsilon):
     maxFactor = 0.4 / sigma
     epsFactor = 0.016316891136
     idr = (sigma / dr)
-    idr[idr <= maxFactor] = 0.0
+    idr[idr <= maxFactor * sigma] = 0.0
     return epsilon * epsFactor + 4 * epsilon * (idr**12 - idr**6)
 
 #def LJPot(dr, sigma, epsilon):
@@ -59,7 +59,7 @@ def WCAPot(dr, sigma, epsilon):
     maxFactor = 0.890898718140339304740226205590512523 /sigma
     idr = (sigma / dr)
 #    idr = idr[idr > maxFactor]
-    idr[idr <= maxFactor] = 0.0
+    idr[idr <= maxFactor * sigma] = 0.0
     return epsilon + epsilon * 4 * (idr**12 - idr**6)
 
 def HertzianPot(dr, sigma, epsilon):
